@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Produtividade</title>
+    <style>
+        body { font-family: Cambria, Cochin, Georgia, Times, sans-serif; }
+        .container { width: 96%; margin: 5px; }
+        textarea { width: 100%; height: 1000px; }
+        .hidden { display: none; }
+        input[type="text"], input[type="date"], input[type="number"], .supervisor-box {
+            width: 100%;
+            padding: 10px;
+            margin:1px 0;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            background-color: #f0f0f0;
+        
+        }
+        .supervisor-option, .base-option, .turno-option{
+            padding: 3px 13px;
+            margin: 3px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(221, 221, 221, 0.89);
+            cursor: pointer;
+            display: inline-block;
+            font-size: 14px;
+            text-align: center;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+        .supervisor-option.selected, .base-option.selected, .turno-option.selected {
+            background-color: #000;
+            color: white;
+        }
+        .supervisor-box {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            background-color: #f0f0f0;
+        }
+        .button-default {
+            border: 1px solid black;
+            padding: 8px 16px;
+            margin: 5px;
+            background-color: #fff;
+            cursor: pointer;
+            font-size: 14px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .button-default:hover {
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .clear-button {
+            background-color: #f44336;
+            color: white;
+        }
+
+        #popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            font-size: 16px;
+            border-radius: 5px;
+            z-index: 1000;
+        }
+        .input-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 11px;
+        }
+
+        .input-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 40%;
+        }
+
+        .input-item label {
+        margin-bottom: 10px;
+        }
+
+        .input-item input {
+        width: 22%;
+        border-radius: 7px;
+        }
+        .produtivo-btn {
+        background-color: green; /* Fundo verde */
+        color: white; /* Fonte branca */
+        }
+
+        .improdutivo-btn {
+        background-color: red; /* Fundo vermelho */
+        color: white; /* Fonte branca */
+        }
+        .button-totalbtn {
+        background-color: #000; /* Fundo vermelho */
+        color: white; /* Fonte branca */
+        font-family: monospace
+        }
+        .button-enviarWhatsApp {
+            background-color: #f44336;
+            color: white;
+        }
+        </style>
+</head>
+<body>
+    <div class="container">
+        <h2 style="text-align: center; font-size: 25px; font-weight: bold; color: #e63946;">MODELO SPRINT/STATUS <br>PRODUTIVIDADE SUPERVISORES<br></h2><h2 style="text-align: center; font-size: 21px; font-weight: bold; color: #000;">(Versão 1.0)</h2>
+
+        
+        <h2>🗒️ Preencha os dados</h2>
+        <br>
+        <label>📅 Data:</label>
+        <input type="date" id="data">
+        <br>
+        <br>
+        <label>🕒 Turno:</label>
+        <input type="text" id="turno" maxlength="1">
+        <button class="button-default turno-option" onclick="setTurno('B')">B</button>
+        <button class="button-default turno-option" onclick="setTurno('C')">C</button>
+        <button class="button-default turno-option" onclick="setTurno('D')">D</button>
+        <br>
+        <br>
+        
+        <label>🏬Base:</label>
+        <input type="text" id="base" readonly>
+        <button class="button-default base-option" onclick="setBase('JACARECANGA')">Jacarecanga</button>
+        <button class="button-default base-option" onclick="setBase('MARACANAU')">Maracanaú</button>
+        <button class="button-default base-option" onclick="setBase('MESSEJANA')">Messejana</button>
+        <br>
+        <br>
+        <label>👤 Supervisor:</label>
+        <input type="text" id="supervisor" class="supervisor-box" readonly>
+        <div id="supervisores">
+            <div class="supervisor-option" onclick="selectSupervisor('FRANCISCO CLECIO')">FRANCISCO CLECIO</div>
+            <div class="supervisor-option" onclick="selectSupervisor('JEFERSON ALVES')">JEFERSON ALVES</div>
+            <div class="supervisor-option" onclick="selectSupervisor('SAMUEL PEIXOTO')">SAMUEL PEIXOTO</div>
+            <div class="supervisor-option" onclick="selectSupervisor('MARCOS FERNANDO')">MARCOS FERNANDO</div>
+            <div class="supervisor-option" onclick="selectSupervisor('JOHNY ANGELO')">JOHNY ANGELO</div>
+            <div class="supervisor-option" onclick="selectSupervisor('HELBER CARNEIRO')">HELBER CARNEIRO</div>
+            <div class="supervisor-option" onclick="selectSupervisor('ROGERIO AQUINO')">ROGERIO AQUINO</div>
+        </div>
+        <br>
+        <label>🚗 Qtd Equipe Emergencial:</label>
+        <input type="number" id="qtdEquipe" maxlength="2">
+        <br>
+        <br>
+        <label>🚗 Qtd Equipe Podas:</label>
+        <input type="number" id="qtdEquipepd" maxlength="2">
+        <br>
+        <br>
+        <br>
+        <br>
+        <h2>📌 Status Produtividade por Equipes</h2>
+        <!-- Exibição da média de produtividade -->
+        <div id="equipes"></div>
+        <br>
+        <h2 style="text-align: left; font-size: 24px; font-weight: bold; color: #e63946; "> Média Geral: <span id="mediaProdutiva">0</span></h2>
+        <button onclick="adicionarEquipe()">Adicionar Equipe</button>
+        <button onclick="removerEquipe()">Remover Equipe</button>
+        <br>
+        <button onclick="gerarMensagem()">Gerar Mensagem</button>
+        <button onclick="copiarMensagem()">Copiar Mensagem</button>
+        <br><br>
+        <h2>Mensagem de Previsualização</h2>
+        <textarea id="mensagem" readonly></textarea>
+        <br>
+        <button onclick="enviarWhatsApp()">Encaminhar via WhatsApp</button>
+        <button class="clear-button" onclick="limparMensagem()">LIMPAR A MENSAGEM</button>
+        <BR>
+        <!-- Logo da ENEL abaixo do título -->
+        <BR>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/2/22/Enel_Group_logo.svg" alt="Logo ENEL" class="enel-logo" style="width: 193px; height: auto; display: block; margin-left: auto; margin-right: auto;">
+        <BR>
+    </div>
+    <p style="text-align: center; font-style: italic; font-family: 'Courier New', Courier, monospace; margin-top: 40px;"> © 2025 Emanuel Aguiar (Assistente Administrativo Insourcing - Enel CE)<br>Todos os direitos reservados.</p>
+
+    <!-- Popup -->
+    <div id="popup">Mensagem Copiada!</div>
+
+    <script>
+        function setTurno(turno) {
+            document.getElementById('turno').value = turno;
+            updateButtonSelection('turno', turno);
+        }
+        function setBase(base) {
+        document.getElementById('base').value = base;
+
+        // Remove a classe 'selected' de todos os botões da base
+        let baseButtons = document.querySelectorAll('.base-option');
+        baseButtons.forEach(button => button.classList.remove('selected'));
+
+        // Normaliza o nome da base para evitar erros de comparação
+        let selectedButton = Array.from(baseButtons).find(button => 
+            button.innerText.trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase() === 
+            base.trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase()
+        );
+
+        if (selectedButton) {
+            selectedButton.classList.add('selected');
+        }
+        }
+        function selectSupervisor(nome) {
+            let options = document.querySelectorAll('.supervisor-option');
+            options.forEach(option => option.classList.remove('selected'));
+
+            let supervisorBox = document.getElementById('supervisor');
+            supervisorBox.value = nome;
+
+            let selectedOption = Array.from(options).find(option => option.innerText === nome);
+            selectedOption.classList.add('selected');
+        }
+
+        function updateButtonSelection(type, value) {
+            let buttons;
+            if (type === 'turno') {
+                buttons = document.querySelectorAll('.turno-option');
+            } else if (type === 'base') {
+                buttons = document.querySelectorAll('.base-option');
+            }
+            buttons.forEach(button => {
+                if (button.innerText === value) {
+                    button.classList.add('selected');
+                } else {
+                    button.classList.remove('selected');
+                }
+            });
+        }
+        function adicionarEquipe() {
+            let container = document.getElementById('equipes');
+            let novaEquipe = document.createElement('div');
+            novaEquipe.classList.add('equipe');
+            novaEquipe.innerHTML = `
+                <hr>
+                    <h1>🚗 LEAD:</h1>
+                    <select id="lead" class="lead">
+                    <!-- Turno B -->
+                    <option value="DFJ-SG-01B">DFJ-SG-01B</option>
+                    <option value="DFJ-SG-02B">DFJ-SG-02B</option>
+                    <option value="DFJ-SG-03B">DFJ-SG-03B</option>
+                    <option value="DFJ-SG-04B">DFJ-SG-04B</option>
+                    <option value="DFJ-SG-05B">DFJ-SG-05B</option>
+                    <option value="DFJ-SG-06B">DFJ-SG-06B</option>
+                    <option value="DFJ-SG-07B">DFJ-SG-07B</option>
+                    <option value="DFJ-SG-08B">DFJ-SG-08B</option>
+                    <option value="DFJ-SG-09B">DFJ-SG-09B</option>
+                    <option value="DFJ-SG-10B">DFJ-SG-10B</option>
+                    <option value="DFJ-SG-11B">DFJ-SG-11B</option>
+                    <option value="DFJ-SG-12B">DFJ-SG-12B</option>
+                    <option value="DFJ-SG-13B">DFJ-SG-13B</option>
+                    <option value="DFJ-SG-14B">DFJ-SG-14B</option>
+                    <option value="DFJ-SG-15B">DFJ-SG-15B</option>
+                    <option value="DFJ-SG-16B">DFJ-SG-16B</option>
+                    <option value="DFJ-SG-17B">DFJ-SG-17B</option>
+                    <option value="DFJ-SG-18B">DFJ-SG-18B</option>
+                    <option value="DFJ-SG-19B">DFJ-SG-19B</option>
+                    <option value="DFJ-SG-20B">DFJ-SG-20B</option>
+                    <option value="DFJ-SG-21B">DFJ-SG-21B</option>
+                    <option value="DFJ-SG-22B">DFJ-SG-22B</option>
+
+                    <!-- Turno C -->
+                    <option value="DFJ-SG-01C">DFJ-SG-01C</option>
+                    <option value="DFJ-SG-02C">DFJ-SG-02C</option>
+                    <option value="DFJ-SG-03C">DFJ-SG-03C</option>
+                    <option value="DFJ-SG-04C">DFJ-SG-04C</option>
+                    <option value="DFJ-SG-05C">DFJ-SG-05C</option>
+                    <option value="DFJ-SG-06C">DFJ-SG-06C</option>
+                    <option value="DFJ-SG-07C">DFJ-SG-07C</option>
+                    <option value="DFJ-SG-08C">DFJ-SG-08C</option>
+                    <option value="DFJ-SG-09C">DFJ-SG-09C</option>
+                    <option value="DFJ-SG-10C">DFJ-SG-10C</option>
+                    <option value="DFJ-SG-11C">DFJ-SG-11C</option>
+                    <option value="DFJ-SG-12C">DFJ-SG-12C</option>
+                    <option value="DFJ-SG-13C">DFJ-SG-13C</option>
+                    <option value="DFJ-SG-14C">DFJ-SG-14C</option>
+                    <option value="DFJ-SG-15C">DFJ-SG-15C</option>
+
+                    <!-- Turno D -->
+                    <option value="DFJ-SG-01D">DFJ-SG-01D</option>
+                    <option value="DFJ-SG-02D">DFJ-SG-02D</option>
+                    <option value="DFJ-SG-03D">DFJ-SG-03D</option>
+                    <option value="DFJ-SG-04D">DFJ-SG-04D</option>
+                    <option value="DFJ-SG-05D">DFJ-SG-05D</option>
+</select>
+                    <br>
+                    <br>
+                    <div class="tabela-compacta">
+                    <table>
+                    <tr>
+                    <td><label for="produtivo">✅ Produtiva:</label></td>
+                    <td><input type="number" id="produtivo" class="produtivo" maxlength="2"    oninput="calcularTotalAtendimentos(this)"></td>
+                    </tr>
+                    <tr>
+                    <td><label for="improdutivo">🚫 Improdutiva:</label></td>
+                    <td><input type="number" id="improdutivo" class="improdutivo" maxlength="2"       oninput="calcularTotalAtendimentos(this)"></td>
+                    </tr>
+                    <tr>
+                    <td><label for="total">Total:</label></td>
+                    <td><input type="number" id="total" class="totalAtendimentos" maxlength="2" readonly></td>
+                    </tr>
+                    </table>
+                    
+                    <br>
+                    <label for="Tipos de Improdutiva">Tipos de Improdutivas:</label>
+                    <input type="text" id="tipoImprodutiva" class="tipoImprodutiva" placeholder="Especificar Tipo" style="text-transform: uppercase;">
+                    <br>
+                    <label for="justificativa">Justificativa:</label>
+                    <input type="text" id="justificativa" class="justificativa" placeholder="Especificar justificativa" style="text-transform: uppercase;">
+                    <br>
+                    <br>
+    </div>
+</div>
+
+                    `;
+            container.appendChild(novaEquipe);
+        }
+
+        function removerEquipe() {
+            let container = document.getElementById('equipes');
+            if (container.children.length > 0) {
+                container.removeChild(container.lastChild);
+            }
+        }
+        function calcularTotalAtendimentos(element) {
+                let equipe = element.closest('.equipe');
+                let produtivo = parseInt(equipe.querySelector('.produtivo').value) || 0;
+                let improdutivo = parseInt(equipe.querySelector('.improdutivo').value) || 0;
+                equipe.querySelector('.totalAtendimentos').value = produtivo + improdutivo;
+            }
+        function gerarMensagem() {
+            let dataInput = document.getElementById('data').value;
+            let data = new Date(dataInput);
+            // Ajuste para garantir que a data seja no mesmo dia do selecionado, sem alterações
+            data.setHours(data.getHours() + data.getTimezoneOffset() / 60); // Ajusta para o fuso horário local
+            let dataFormatada = `${String(data.getDate()).padStart(2, '0')}/${String(data.getMonth() + 1).padStart(2, '0')}/${data.getFullYear()}`;
+
+            let msg = `----------------- *PRODUTIVIDADE* -------------------\n` +
+                      `*TURNO:* ${document.getElementById('turno').value}\n` +
+                      `*DATA:* ${dataFormatada}\n` +
+                      `*BASE:* ${document.getElementById('base').value}\n` +
+                      `*SUPERVISOR:* ${document.getElementById('supervisor').value}\n` +
+                      `*QTD EQUIPE EMERGÊNCIAL:* ${document.getElementById('qtdEquipe').value}\n` +
+                      `*QTD EQUIPE PODAS:* ${document.getElementById('qtdEquipepd').value}\n`+
+                      `*MÉDIA GERAL:* ${document.getElementById('mediaProdutiva').innerText}\n\n`;
+
+            document.querySelectorAll('.equipe').forEach(equipe => {
+                msg += `----------------------------------------------------\n` +
+                    `*LEAD:* ${equipe.querySelector('.lead').value}\n` +
+                    `*PRODUTIVO:* ${equipe.querySelector('.produtivo').value}\n` +
+                    `*IMPRODUTIVO:* ${equipe.querySelector('.improdutivo').value}\n` +
+                    `*TOTAL ATENDIMENTOS:* ${equipe.querySelector('.totalAtendimentos').value}\n` +
+                    `*TIPO IMPRODUTIVA:* ${equipe.querySelector('.tipoImprodutiva').value}\n` +
+                    `*JUSTIFICATIVA:* ${equipe.querySelector('.justificativa').value}\n\n`;
+            });
+
+            // Converter toda a mensagem para maiúscula
+            msg = msg.toUpperCase();
+
+            document.getElementById('mensagem').value = msg;
+        }
+
+        function copiarMensagem() {
+            let mensagem = document.getElementById('mensagem');
+            mensagem.select();
+            document.execCommand('copy');
+            document.getElementById('popup').style.display = 'block';
+            setTimeout(() => document.getElementById('popup').style.display = 'none', 2000);
+        }
+
+        function enviarWhatsApp() {
+            let mensagem = document.getElementById('mensagem').value;
+            let encodedMessage = encodeURIComponent(mensagem);
+            window.open(`https://wa.me/?text=${encodedMessage}`, '_blank');
+        }
+        function limparMensagem() {
+        document.getElementById('mensagem').value = ''; // Limpa o campo de mensagem
+        }
+        // Função para calcular o total de atendimentos e atualizar a média
+        function calcularTotalAtendimentos(element) {
+            let equipe = element.closest('.equipe');
+            let produtivo = parseInt(equipe.querySelector('.produtivo').value) || 0;
+            let improdutivo = parseInt(equipe.querySelector('.improdutivo').value) || 0;
+            equipe.querySelector('.totalAtendimentos').value = produtivo + improdutivo;
+
+            atualizarMediaProdutiva();  // Atualiza a média de produtividade
+        }
+
+        // Função para calcular a média de produtividade
+        function atualizarMediaProdutiva() {
+            let totalProdutivo = 0;
+            let equipes = document.querySelectorAll('.equipe');
+            let numEquipes = equipes.length;
+
+            equipes.forEach(equipe => {
+                let produtivo = parseInt(equipe.querySelector('.produtivo').value) || 0;
+                totalProdutivo += produtivo;
+            });
+
+            let media = numEquipes > 0 ? totalProdutivo / numEquipes : 0;
+            document.getElementById('mediaProdutiva').innerText = media.toFixed(2);  // Exibe a média com duas casas decimais
+        }
+    </script>
+</body>
+</html>
