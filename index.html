@@ -10,6 +10,16 @@
        CSS - Estilos
   ================================ -->
   <style>
+    /* Estilo para a Caixa de Visualização */
+  .preview-box {
+      border: 1px solid #ddd;
+      padding: 10px;
+      margin-top: -10px;
+      background-color: #f0f0f0;
+      white-space: pre-wrap;
+      font-family: monospace;
+      font-size: 14px;
+    }  
     /* Estilos Globais */
     body { 
       font-family: Cambria, Cochin, Georgia, Times, sans-serif; 
@@ -59,7 +69,7 @@
     }
     .supervisor-box {
       width: 100%;
-      padding: 8px;
+      padding: 6px;
       margin: 5px 0;
       font-size: 14px;
       border: 1px solid #ddd;
@@ -166,7 +176,7 @@
   <!-- ===============================
        HTML - Estrutura do Corpo
   ================================ -->
-  <div class="container">
+    <div class="container">
     <h2 style="text-align: center; font-size: 25px; font-weight: bold; color: #e63946;">
       MODELO SPRINT/STATUS <br>PRODUTIVIDADE SUPERVISORES<br>
     </h2>
@@ -218,7 +228,7 @@
     <button onclick="removerEquipe()">Remover Equipe</button>
     <br>
     <h2>Mensagem de Previsualização</h2>
-    <textarea id="mensagem" readonly></textarea>
+    <textarea id="mensagem" class="preview-box" readonly></textarea>
     <br>
     <!-- Botões com novo estilo -->
     <button class="button-gerarMensagem" onclick="gerarMensagem()">Gerar Mensagem</button>
