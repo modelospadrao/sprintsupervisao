@@ -10,22 +10,22 @@
        CSS - Estilos
   ================================ -->
   <style>
-    /* Estilo para a Caixa de Visualização */
-  .preview-box {
+    /* Caixa de Visualização */
+    .preview-box {
       border: 1px solid #ddd;
       padding: 10px;
-      margin-top: -10px;
+      margin-top: -13px;
       background-color: #f0f0f0;
       white-space: pre-wrap;
       font-family: monospace;
       font-size: 14px;
-    }  
+    }
     /* Estilos Globais */
     body { 
       font-family: Cambria, Cochin, Georgia, Times, sans-serif; 
     }
     .container { 
-      width: 90%; 
+      width: 92%; 
       margin: auto; 
     }
     textarea { 
@@ -40,8 +40,8 @@
     input[type="number"],
     .supervisor-box {
       width: 100%;
-      padding: 10px;
-      margin: 1px 0;
+      padding: 5px;
+      margin: 4px 0;
       font-size: 14px;
       border: 1px solid #ddd;
       background-color: #f0f0f0;
@@ -50,7 +50,7 @@
     .supervisor-option,
     .base-option,
     .turno-option {
-      padding: 3px 13px;
+      padding: 3px 8px;
       margin: 3px;
       background-color: rgba(255, 255, 255, 0.9);
       border: 1px solid rgba(221, 221, 221, 0.89);
@@ -170,17 +170,134 @@
       color: white;
       font-family: monospace;
     }
+    /* ===============================
+         Novos Estilos para Status Produtividade por Equipe
+    ================================ */
+    .equipe {
+      border: 1px solid #000000;
+      padding: 4px;
+      box-sizing: border-box;
+      margin-bottom: 8px;
+      background-color: #fff;
+      position: relative; /* Para posicionar a caixa Total */
+    }
+    .equipe-header,
+    .equipe-status,
+    .equipe-details {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    /* Cabeçalho: Lead */
+    .equipe-header h3 {
+      margin: 0;
+      font-size: 20px;
+    }
+    .equipe-header select {
+      margin-left: 50px;
+      padding: 5px;
+    }
+    /* Status: Produtividade */
+    .equipe-status {
+      width: 91%;
+      margin-top: 7px;
+    }
+    .status-row {
+      display: flex;
+      justify-content: space-around;
+      width: 100%;
+      margin-bottom: -4px;
+    }
+    .produtiva-container, .improdutiva-container {
+      flex: 1;
+      text-align: center;
+    }
+    .produtiva-container label,
+    .improdutiva-container label {
+      display: block;
+      margin-bottom: -1px;
+      font-size: 14px;
+    }
+    .produtiva-container input,
+    .improdutiva-container input {
+      width: 5ch;
+      padding: 4px;
+      text-align: right;
+      font-size: 13px;
+    }
+    /* Removida a .total-row interna */
+    /* Detalhes: Tipos e Justificativa */
+    .equipe-details {
+      width: 97%;
+      flex-direction: column;
+      margin-top: 19px;
+    }
+    .equipe-details label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 14px;
+    }
+    .equipe-details input {
+      width: 95%;
+      padding: 5px;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      font-size: 14px;
+    }
+    /* Estilo para a caixa Total (novo posicionamento) */
+    .total-box {
+      position: absolute;
+      background-color: #000;
+      color: #fff;
+      padding: 7px 17px;
+      border-radius: 22px;
+      font-size: 12px;
+    }
+    /* Posições possíveis para a caixa Total */
+    .total-top-right {
+      top: 5px;
+      right: 5px;
+    }
+    .total-top-left {
+      top: 5px;
+      left: 5px;
+    }
+    .total-bottom-right {
+      bottom: 5px;
+      right: 5px;
+    }
+    .total-bottom-left {
+      bottom: 5px;
+      left: 5px;
+    }
+    /* Responsividade para dispositivos móveis */
+    @media(max-width: 480px) {
+      .status-row {
+        flex-direction: column;
+        align-items: center;
+      }
+      .produtiva-container, .improdutiva-container {
+        margin-bottom: 10px;
+      }
+    }
+    /* Margens para modo retrato */
+    @media (orientation: portrait) {
+      .container {
+        margin-top: 20px;
+        margin-bottom: 20px;
+      }
+    }
   </style>
 </head>
 <body>
   <!-- ===============================
        HTML - Estrutura do Corpo
   ================================ -->
-    <div class="container">
+  <div class="container">
     <h2 style="text-align: center; font-size: 25px; font-weight: bold; color: #e63946;">
       MODELO SPRINT/STATUS <br>PRODUTIVIDADE SUPERVISORES<br>
     </h2>
-    <h2 style="text-align: center; font-size: 21px; font-weight: bold; color: #000;">(Versão 1.0)</h2>
+    <h2 style="text-align: center; font-size: 21px; font-weight: bold; color: #000;">(Versão 1.3)</h2>
 
     <h2>🗒️ Preencha os dados</h2>
     <br>
@@ -211,14 +328,21 @@
       <div class="supervisor-option" onclick="selectSupervisor('ROGERIO AQUINO')">ROGERIO AQUINO</div>
     </div>
     <br>
-    <label>🚗 Qtd Equipe Emergencial:</label>
+    <label>🚗 Quantidade de Equipes atuando no Emergencial:</label>
     <input type="number" id="qtdEquipe" maxlength="2">
     <br><br>
-    <label>🚗 Qtd Equipe Podas:</label>
+    <label>🚗 Quantidade de Equipes atuando em Podas:</label>
     <input type="number" id="qtdEquipepd" maxlength="2">
-    <br><br><br><br>
+    
     <h2>📌 Status Produtividade por Equipes</h2>
-    <!-- Exibição da média de produtividade -->
+    <!-- Seletor para a posição da Caixa Total -->
+    <label for="totalBoxPositionSelect">Posição da Caixa Total:</label>
+    <select id="totalBoxPositionSelect" onchange="updateTotalBoxPosition(this.value)">
+      <option value="top-right" selected>Superior Direita</option>
+      <option value="top-left">Superior Esquerda</option>
+      <option value="bottom-right">Inferior Direita</option>
+      <option value="bottom-left">Inferior Esquerda</option>
+    </select>
     <div id="equipes"></div>
     <br>
     <h2 style="text-align: left; font-size: 24px; font-weight: bold; color: #e63946;">
@@ -253,17 +377,17 @@
        JavaScript - Lógica e Funcionalidades
   ================================ -->
   <script>
-    // Funções de seleção e atualização dos botões
+    // Variável global para armazenar a posição atual da caixa Total (padrão: top-right)
+    let currentTotalBoxPosition = 'top-right';
+
     function setTurno(turno) {
       document.getElementById('turno').value = turno;
       updateButtonSelection('turno', turno);
     }
     function setBase(base) {
       document.getElementById('base').value = base;
-      // Remove a classe 'selected' de todos os botões da base
       let baseButtons = document.querySelectorAll('.base-option');
       baseButtons.forEach(button => button.classList.remove('selected'));
-      // Seleciona o botão correspondente
       let selectedButton = Array.from(baseButtons).find(button =>
         button.innerText.trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase() === 
         base.trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase()
@@ -295,17 +419,18 @@
         }
       });
     }
-
-    // Funções para adicionar e remover equipes
     function adicionarEquipe() {
       let container = document.getElementById('equipes');
       let novaEquipe = document.createElement('div');
       novaEquipe.classList.add('equipe');
       novaEquipe.innerHTML = `
-        <hr>
-        <h1>🚗 LEAD:</h1>
-        <select id="lead" class="lead">
-          <!-- Turno B -->
+        <div class="total-box total-${currentTotalBoxPosition}">
+          TOTAL: <span class="totalAtendimentos">0</span>
+        </div>
+        <div class="equipe-header">
+          <h3>🚗 LEAD:</h3>
+          <select class="lead">
+            <!-- Turno B -->
           <option value="DFJ-SG-01B">DFJ-SG-01B</option>
           <option value="DFJ-SG-02B">DFJ-SG-02B</option>
           <option value="DFJ-SG-03B">DFJ-SG-03B</option>
@@ -350,36 +475,25 @@
           <option value="DFJ-SG-03D">DFJ-SG-03D</option>
           <option value="DFJ-SG-04D">DFJ-SG-04D</option>
           <option value="DFJ-SG-05D">DFJ-SG-05D</option>
-        </select>
-        <br><br>
-        <div class="tabela-compacta">
-          <table>
-            <tr>
-              <td><label for="produtivo">✅ Produtiva:</label></td>
-              <td>
-                <input type="number" id="produtivo" class="produtivo" maxlength="2" oninput="calcularTotalAtendimentos(this)">
-              </td>
-            </tr>
-            <tr>
-              <td><label for="improdutivo">🚫 Improdutiva:</label></td>
-              <td>
-                <input type="number" id="improdutivo" class="improdutivo" maxlength="2" oninput="calcularTotalAtendimentos(this)">
-              </td>
-            </tr>
-            <tr>
-              <td><label for="total">Total:</label></td>
-              <td>
-                <input type="number" id="total" class="totalAtendimentos" maxlength="2" readonly>
-              </td>
-            </tr>
-          </table>
-          <br>
-          <label for="Tipos de Improdutiva">Tipos de Improdutivas:</label>
-          <input type="text" id="tipoImprodutiva" class="tipoImprodutiva" placeholder="Especificar Tipo" style="text-transform: uppercase;">
-          <br>
-          <label for="justificativa">Justificativa:</label>
-          <input type="text" id="justificativa" class="justificativa" placeholder="Especificar justificativa" style="text-transform: uppercase;">
-          <br><br>
+          </select>
+        </div>
+        <div class="equipe-status">
+          <div class="status-row">
+            <div class="produtiva-container">
+              <label>✅ PRODUTIVA:</label>
+              <input type="number" class="produtivo" maxlength="3" oninput="calcularTotalAtendimentos(this)" placeholder="00">
+            </div>
+            <div class="improdutiva-container">
+              <label>🚫 IMPRODUTIVA:</label>
+              <input type="number" class="improdutivo" maxlength="3" oninput="calcularTotalAtendimentos(this)" placeholder="00">
+            </div>
+          </div>
+        </div>
+        <div class="equipe-details">
+          <label>TIPOS DE IMPRODUTIVAS:</label>
+          <input type="text" class="tipoImprodutiva" placeholder="Especificar Tipo">
+          <label>JUSTIFICATIVA:</label>
+          <input type="text" class="justificativa" placeholder="Especificar justificativa">
         </div>
       `;
       container.appendChild(novaEquipe);
@@ -390,17 +504,14 @@
         container.removeChild(container.lastChild);
       }
     }
-
-    // Função para calcular o total de atendimentos e atualizar a média
     function calcularTotalAtendimentos(element) {
       let equipe = element.closest('.equipe');
       let produtivo = parseInt(equipe.querySelector('.produtivo').value) || 0;
       let improdutivo = parseInt(equipe.querySelector('.improdutivo').value) || 0;
-      equipe.querySelector('.totalAtendimentos').value = produtivo + improdutivo;
+      // Atualiza o valor no span da caixa Total
+      equipe.querySelector('.total-box .totalAtendimentos').innerText = produtivo + improdutivo;
       atualizarMediaProdutiva();
     }
-
-    // Função para atualizar a média de produtividade
     function atualizarMediaProdutiva() {
       let totalProdutivo = 0;
       let equipes = document.querySelectorAll('.equipe');
@@ -412,14 +523,19 @@
       let media = numEquipes > 0 ? totalProdutivo / numEquipes : 0;
       document.getElementById('mediaProdutiva').innerText = media.toFixed(2);
     }
-
+    function updateTotalBoxPosition(position) {
+      currentTotalBoxPosition = position;
+      document.querySelectorAll('.total-box').forEach(box => {
+        // Remove todas as classes de posição
+        box.classList.remove('total-top-right', 'total-top-left', 'total-bottom-right', 'total-bottom-left');
+        box.classList.add(`total-${position}`);
+      });
+    }
     function gerarMensagem() {
       let dataInput = document.getElementById('data').value;
       let data = new Date(dataInput);
-      // Ajusta para o fuso horário local
       data.setHours(data.getHours() + data.getTimezoneOffset() / 60);
       let dataFormatada = `${String(data.getDate()).padStart(2, '0')}/${String(data.getMonth() + 1).padStart(2, '0')}/${data.getFullYear()}`;
-
       let msg = `----------------- *PRODUTIVIDADE* -------------------\n` +
                 `*TURNO:* ${document.getElementById('turno').value}\n` +
                 `*DATA:* ${dataFormatada}\n` +
@@ -428,22 +544,18 @@
                 `*QTD EQUIPE EMERGÊNCIAL:* ${document.getElementById('qtdEquipe').value}\n` +
                 `*QTD EQUIPE PODAS:* ${document.getElementById('qtdEquipepd').value}\n` +
                 `*MÉDIA GERAL:* ${document.getElementById('mediaProdutiva').innerText}\n\n`;
-
       document.querySelectorAll('.equipe').forEach(equipe => {
         msg += `----------------------------------------------------\n` +
                `*LEAD:* ${equipe.querySelector('.lead').value}\n` +
                `*PRODUTIVO:* ${equipe.querySelector('.produtivo').value}\n` +
                `*IMPRODUTIVO:* ${equipe.querySelector('.improdutivo').value}\n` +
-               `*TOTAL ATENDIMENTOS:* ${equipe.querySelector('.totalAtendimentos').value}\n` +
+               `*TOTAL ATENDIMENTOS:* ${equipe.querySelector('.total-box .totalAtendimentos').innerText}\n` +
                `*TIPO IMPRODUTIVA:* ${equipe.querySelector('.tipoImprodutiva').value}\n` +
                `*JUSTIFICATIVA:* ${equipe.querySelector('.justificativa').value}\n\n`;
       });
-
-      // Converter toda a mensagem para maiúsculas
       msg = msg.toUpperCase();
       document.getElementById('mensagem').value = msg;
     }
-
     function copiarMensagem() {
       let mensagem = document.getElementById('mensagem');
       mensagem.select();
@@ -451,13 +563,11 @@
       document.getElementById('popup').style.display = 'block';
       setTimeout(() => document.getElementById('popup').style.display = 'none', 2000);
     }
-
     function enviarWhatsApp() {
       let mensagem = document.getElementById('mensagem').value;
       let encodedMessage = encodeURIComponent(mensagem);
       window.open(`https://wa.me/?text=${encodedMessage}`, '_blank');
     }
-
     function limparMensagem() {
       document.getElementById('mensagem').value = '';
     }
