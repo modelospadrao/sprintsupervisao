@@ -512,16 +512,26 @@
       equipe.querySelector('.total-box .totalAtendimentos').innerText = produtivo + improdutivo;
       atualizarMediaProdutiva();
     }
+    // Função para atualizar a média de produtividade
     function atualizarMediaProdutiva() {
-      let totalProdutivo = 0;
-      let equipes = document.querySelectorAll('.equipe');
-      let numEquipes = equipes.length;
-      equipes.forEach(equipe => {
-        let produtivo = parseInt(equipe.querySelector('.produtivo').value) || 0;
-        totalProdutivo += produtivo;
-      });
-      let media = numEquipes > 0 ? totalProdutivo / numEquipes : 0;
-      document.getElementById('mediaProdutiva').innerText = media.toFixed(2);
+  let totalProdutivo = 0;
+  let equipesComProdutivo = 0;
+
+  let equipes = document.querySelectorAll('.equipe');
+
+  equipes.forEach(equipe => {
+    let produtivoInput = equipe.querySelector('.produtivo').value;
+    let produtivo = parseInt(produtivoInput);
+
+    if (!isNaN(produtivo) && produtivo > 0) {
+      totalProdutivo += produtivo;
+      equipesComProdutivo += 1;
+    }
+  });
+
+  let media = equipesComProdutivo > 0 ? totalProdutivo / equipesComProdutivo : 0;
+
+  document.getElementById('mediaProdutiva').innerText = media.toFixed(2);
     }
     function updateTotalBoxPosition(position) {
       currentTotalBoxPosition = position;
