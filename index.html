@@ -14,7 +14,7 @@
     .preview-box {
       border: 1px solid #ddd;
       padding: 10px;
-      margin-top: -13px;
+      margin-top: -10px;
       background-color: #f0f0f0;
       white-space: pre-wrap;
       font-family: monospace;
@@ -25,7 +25,7 @@
       font-family: Cambria, Cochin, Georgia, Times, sans-serif; 
     }
     .container { 
-      width: 92%; 
+      width: 99%; 
       margin: auto; 
     }
     textarea { 
@@ -174,12 +174,24 @@
          Novos Estilos para Status Produtividade por Equipe
     ================================ */
     .equipe {
-      border: 1px solid #000000;
-      padding: 4px;
-      box-sizing: border-box;
-      margin-bottom: 8px;
-      background-color: #fff;
-      position: relative; /* Para posicionar a caixa Total */
+      border: 2px solid #000;
+      border-radius: 10px;
+      margin-bottom: 37px;
+      background: #fff;
+      padding: 11px;
+      position: relative;
+    }
+    .chrome-tab {
+      position: absolute;
+      top: -31px;
+      left: 15px;
+      background-color: #000;
+      color: white;
+      padding: 5px 21px;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+      font-weight: bold;
+      font-size: 14px;
     }
     .equipe-header,
     .equipe-status,
@@ -191,46 +203,52 @@
     /* Cabeçalho: Lead */
     .equipe-header h3 {
       margin: 0;
-      font-size: 20px;
+      background-color: #000;
+      margin-top: -79px;
+      margin-left: 1px;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+      color: white;
+      width: 25%;
+      font-size: 22px;
     }
     .equipe-header select {
-      margin-left: 50px;
+      margin-left: -110px;
+      margin-top: -7px;
       padding: 5px;
     }
     /* Status: Produtividade */
     .equipe-status {
-      width: 91%;
-      margin-top: 7px;
+      width: 51%;
+      margin-top: 4px;
     }
     .status-row {
       display: flex;
       justify-content: space-around;
       width: 100%;
-      margin-bottom: -4px;
-    }
-    .produtiva-container, .improdutiva-container {
-      flex: 1;
-      text-align: center;
+      margin-bottom: -7px;
     }
     .produtiva-container label,
     .improdutiva-container label {
       display: block;
-      margin-bottom: -1px;
+      margin-left: -4px;
+      margin-bottom: -5px;
+      padding: 5px;
       font-size: 14px;
     }
     .produtiva-container input,
     .improdutiva-container input {
       width: 5ch;
-      padding: 4px;
-      text-align: right;
-      font-size: 13px;
+      padding: 7px;
+      text-align: center;
+      font-size: 14px;
     }
     /* Removida a .total-row interna */
     /* Detalhes: Tipos e Justificativa */
     .equipe-details {
-      width: 97%;
+      width: 100%;
       flex-direction: column;
-      margin-top: 19px;
+      margin-top: 10px;
     }
     .equipe-details label {
       display: block;
@@ -249,9 +267,9 @@
       position: absolute;
       background-color: #000;
       color: #fff;
-      padding: 7px 17px;
-      border-radius: 22px;
-      font-size: 12px;
+      padding: 4px 8px;
+      border-radius: 10px;
+      font-size: 18px;
     }
     /* Posições possíveis para a caixa Total */
     .total-top-right {
@@ -335,14 +353,7 @@
     <input type="number" id="qtdEquipepd" maxlength="2">
     
     <h2>📌 Status Produtividade por Equipes</h2>
-    <!-- Seletor para a posição da Caixa Total -->
-    <label for="totalBoxPositionSelect">Posição da Caixa Total:</label>
-    <select id="totalBoxPositionSelect" onchange="updateTotalBoxPosition(this.value)">
-      <option value="top-right" selected>Superior Direita</option>
-      <option value="top-left">Superior Esquerda</option>
-      <option value="bottom-right">Inferior Direita</option>
-      <option value="bottom-left">Inferior Esquerda</option>
-    </select>
+    <br>
     <div id="equipes"></div>
     <br>
     <h2 style="text-align: left; font-size: 24px; font-weight: bold; color: #e63946;">
@@ -512,26 +523,16 @@
       equipe.querySelector('.total-box .totalAtendimentos').innerText = produtivo + improdutivo;
       atualizarMediaProdutiva();
     }
-    // Função para atualizar a média de produtividade
     function atualizarMediaProdutiva() {
-  let totalProdutivo = 0;
-  let equipesComProdutivo = 0;
-
-  let equipes = document.querySelectorAll('.equipe');
-
-  equipes.forEach(equipe => {
-    let produtivoInput = equipe.querySelector('.produtivo').value;
-    let produtivo = parseInt(produtivoInput);
-
-    if (!isNaN(produtivo) && produtivo > 0) {
-      totalProdutivo += produtivo;
-      equipesComProdutivo += 1;
-    }
-  });
-
-  let media = equipesComProdutivo > 0 ? totalProdutivo / equipesComProdutivo : 0;
-
-  document.getElementById('mediaProdutiva').innerText = media.toFixed(2);
+      let totalProdutivo = 0;
+      let equipes = document.querySelectorAll('.equipe');
+      let numEquipes = equipes.length;
+      equipes.forEach(equipe => {
+        let produtivo = parseInt(equipe.querySelector('.produtivo').value) || 0;
+        totalProdutivo += produtivo;
+      });
+      let media = numEquipes > 0 ? totalProdutivo / numEquipes : 0;
+      document.getElementById('mediaProdutiva').innerText = media.toFixed(2);
     }
     function updateTotalBoxPosition(position) {
       currentTotalBoxPosition = position;
