@@ -5,11 +5,68 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Produtividade</title>
   <link rel="icon" href="sprint.png" type="image/png">
+  
+  <!-- Importa a biblioteca html2pdf -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
 
   <!-- ===============================
        CSS - Estilos
   ================================ -->
   <style>
+    /* Bloqueia o pull-to-refresh */
+    html, body {
+      overscroll-behavior-y: none;
+    }
+    /* Global Clock */
+    #global-clock {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      font-size: 24px;
+      font-family: 'Courier New', Courier, monospace;
+      color: #fff;
+      background-color: #000;
+      padding: 10px;
+      border-radius: 8px;
+      z-index: 1001;
+      display: none; /* exibido somente após iniciar o sprint */
+    }
+    /* Estilos para Popups (boas-vindas, notificações, cópia, PDF) */
+    .popup {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      padding: 20px;
+      background-color: rgba(0, 0, 0, 0.8);
+      color: white;
+      font-size: 16px;
+      border-radius: 5px;
+      z-index: 1000;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+      text-align: center;
+    }
+    .popup-buttons {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 10px;
+    }
+    .popup-buttons button {
+      padding: 8px 16px;
+      font-size: 14px;
+      border-radius: 4px;
+      cursor: pointer;
+      border: none;
+    }
+    .yes-button {
+      background-color: #4CAF50;
+      color: white;
+    }
+    .no-button {
+      background-color: #f44336;
+      color: white;
+    }
     /* Caixa de Visualização */
     .preview-box {
       border: 1px solid #ddd;
@@ -25,7 +82,7 @@
       font-family: Cambria, Cochin, Georgia, Times, sans-serif; 
     }
     .container { 
-      width: 99%; 
+      width: 90%; 
       margin: auto; 
     }
     textarea { 
@@ -124,8 +181,9 @@
       transition: all 0.3s ease;
       box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
     }
-    /* Outras classes */
+    /* Popup para confirmação de cópia (id="popup") */
     #popup {
+      /* usado para confirmação de cópia */
       display: none;
       position: fixed;
       top: 50%;
@@ -171,7 +229,7 @@
       font-family: monospace;
     }
     /* ===============================
-         Novos Estilos para Status Produtividade por Equipe
+         Estilos para Status Produtividade por Equipe
     ================================ */
     .equipe {
       border: 2px solid #000;
@@ -211,43 +269,64 @@
       color: white;
       width: 32%;
       font-size: 22px;
-      text-align: center
+      text-align: center;
     }
     .equipe-header select {
       margin-left: -125px;
       margin-top: -5px;
       padding: 5px;
-      }
+    }
     /* Status: Produtividade */
     .equipe-status {
       width: 121%;
       margin-top: 4px;
       padding: 0px;
     }
+    /* Linha de status com os containers de PRODUTIVA e IMPRODUTIVA */
     .status-row {
       display: flex;
-      justify-content: space-around;
+      justify-content: center;
+      align-items: center;
+      gap: 15px;
       width: 100%;
-      margin-bottom: -7px;
+      margin-bottom: 5px;
+    }
+    /* Containers de PRODUTIVA e IMPRODUTIVA */
+    .produtiva-container {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px;
+      margin-top: 10px;
+      margin-right: 10px;
+      margin-bottom: 10px;
+      margin-left: -77px;
+      box-sizing: border-box;
+    }
+    .improdutiva-container {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px;
+      margin-top: 10px;
+      margin-right: 10px;
+      margin-bottom: 10px;
+      margin-left: -9px;
+      box-sizing: border-box;
     }
     .produtiva-container label,
     .improdutiva-container label {
-      display: block;
-      margin-left: -123px;
-      margin-bottom: -22px;
-      margin-top: 7px;
-      
+      margin: 0;
       font-size: 14px;
+      white-space: nowrap;
     }
     .produtiva-container input,
     .improdutiva-container input {
-      width: 6ch;
-      padding: 0px;
+      width: 50px;
+      padding: 2px;
       text-align: right;
-      
       font-size: 14px;
     }
-    /* Removida a .total-row interna */
     /* Detalhes: Tipos e Justificativa */
     .equipe-details {
       width: 100%;
@@ -266,7 +345,7 @@
       text-transform: uppercase;
       font-size: 13px;
     }
-    /* Estilo para a caixa Total (novo posicionamento) */
+    /* Caixa Total */
     .total-box {
       position: absolute;
       background-color: #000;
@@ -275,7 +354,6 @@
       border-radius: 10px;
       font-size: 18px;
     }
-    /* Posições possíveis para a caixa Total */
     .total-top-right {
       top: 5px;
       right: 5px;
@@ -292,26 +370,93 @@
       bottom: 5px;
       left: 5px;
     }
-    /* Responsividade para dispositivos móveis */
+    /* Responsividade */
     @media(max-width: 480px) {
       .status-row {
         flex-direction: column;
-        align-items: center;
+        gap: 10px;
       }
-      .produtiva-container, .improdutiva-container {
-        margin-bottom: 10px;
+      .produtiva-container,
+      .improdutiva-container {
+        width: 100%;
+        justify-content: center;
       }
     }
-    /* Margens para modo retrato */
     @media (orientation: portrait) {
       .container {
         margin-top: 20px;
         margin-bottom: 20px;
       }
     }
+    /* Botão Salvar PDF */
+    .button-save-pdf {
+      border: 1px solid black;
+      padding: 8px 16px;
+      margin: 30px 0;
+      background-color: #fff;
+      cursor: pointer;
+      font-size: 14px;
+      border-radius: 25px;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+      display: block;
+      width: fit-content;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .button-save-pdf:hover {
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    }
+    /* Botão Reset (Reiniciar Sprint) */
+    #reset-button {
+      border: 1px solid black;
+      padding: 8px 16px;
+      background-color: #000000;
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+      border-radius: 4px;
+      margin: 10px;
+      display: block;
+      width: fit-content;
+      margin-left: auto;
+      margin-right: auto;
+    }
   </style>
 </head>
 <body>
+  <!-- Global Clock -->
+  <div id="global-clock"></div>
+  
+  <!-- Popup de Boas-Vindas -->
+  <div id="welcome-popup" class="popup">
+    <p>Bem-vindo!<br>Deseja iniciar o sprints?</p>
+    <div class="popup-buttons">
+      <button class="yes-button" onclick="startSprint()">Sim</button>
+      <button class="no-button" onclick="handleNoSprint()">Não</button>
+    </div>
+  </div>
+  
+  <!-- Popup de Notificação para Sim -->
+  <div id="yes-notification-popup" class="popup">
+    <p>O sprint iniciará agora. O contador de tempo foi ativado para medir a sessão.</p>
+  </div>
+  
+  <!-- Popup de Notificação para Não -->
+  <div id="no-notification-popup" class="popup">
+    <p>Para iniciar os sprints, por favor, atualize a página usando o botão "Reiniciar Sprint".</p>
+  </div>
+
+  <!-- Popup para confirmação de cópia -->
+  <div id="popup" class="popup">Mensagem Copiada!</div>
+  
+  <!-- Popup para confirmação de PDF salvo -->
+  <div id="pdf-popup" class="popup">
+    PDF salvo com sucesso!
+    <br>
+    <button id="pdf-popup-close" onclick="document.getElementById('pdf-popup').style.display='none'" style="margin-top: 10px; padding: 8px 16px; font-size: 14px; border: none; background-color: #4CAF50; color: white; border-radius: 4px; cursor: pointer;">Fechar</button>
+  </div>
+
   <!-- ===============================
        HTML - Estrutura do Corpo
   ================================ -->
@@ -369,12 +514,17 @@
     <h2>Mensagem de Previsualização</h2>
     <textarea id="mensagem" class="preview-box" readonly></textarea>
     <br>
-    <!-- Botões com novo estilo -->
+    <!-- Botões para ações -->
     <button class="button-gerarMensagem" onclick="gerarMensagem()">Gerar Mensagem</button>
     <button class="button-enviarWhatsApp" onclick="enviarWhatsApp()">Encaminhar via WhatsApp</button><br>
     <button class="clear-button" onclick="limparMensagem()">LIMPAR A MENSAGEM</button>
     <button class="button-default" onclick="copiarMensagem()">Copiar Mensagem</button>
     <br><br>
+    <!-- Botão Salvar PDF -->
+    <button class="button-save-pdf" id="save-pdf-button" onclick="savePdf()">Salvar PDF</button>
+    <br><br>
+    <!-- Botão para Reiniciar Sprint -->
+    <button id="reset-button" onclick="resetSprint()">Reiniciar Sprint</button>
     <br><br>
     <!-- Logo da ENEL -->
     <img src="https://upload.wikimedia.org/wikipedia/commons/2/22/Enel_Group_logo.svg" alt="Logo ENEL" class="enel-logo" style="width: 193px; height: auto; display: block; margin-left: auto; margin-right: auto;">
@@ -385,15 +535,80 @@
     Todos os direitos reservados.
   </p>
 
-  <!-- Popup para confirmação de cópia -->
-  <div id="popup">Mensagem Copiada!</div>
-
   <!-- ===============================
        JavaScript - Lógica e Funcionalidades
   ================================ -->
   <script>
-    // Variável global para armazenar a posição atual da caixa Total (padrão: top-right)
+    // Função para formatar o tempo
+    function formatTime(totalSeconds) {
+      let minutes = Math.floor(totalSeconds / 60);
+      let seconds = totalSeconds % 60;
+      let result = "";
+      if (minutes > 0) {
+          result += minutes + (minutes === 1 ? " minuto" : " minutos");
+          if (seconds > 0) result += " e " + seconds + (seconds === 1 ? " segundo" : " segundos");
+      } else {
+          result += seconds + (seconds === 1 ? " segundo" : " segundos");
+      }
+      return result;
+    }
+
+    // Função para formatar a data por extenso
+    function formatFullDateTime(date) {
+      const meses = [
+          "janeiro", "fevereiro", "março", "abril", "maio", "junho",
+          "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"
+      ];
+      let dia = date.getDate();
+      let mes = meses[date.getMonth()];
+      let ano = date.getFullYear();
+      let horas = date.getHours();
+      let minutos = date.getMinutes();
+      let segundos = date.getSeconds();
+      mes = mes.charAt(0).toUpperCase() + mes.slice(1);
+      let strHoras = `${horas} ${horas === 1 ? "hora" : "horas"}`;
+      let strMinutos = `${minutos} ${minutos === 1 ? "minuto" : "minutos"}`;
+      let strSegundos = `${segundos} ${segundos === 1 ? "segundo" : "segundos"}`;
+      return `${dia} de ${mes} de ${ano} às ${strHoras} e ${strMinutos} e ${strSegundos}`;
+    }
+
+    // Variáveis globais para o timer e controle do PDF
+    let globalTimerStart = null;
+    let globalTimerInterval = null;
+    let pdfSaved = false;
+    // Variável para a posição da caixa Total (padrão: 'top-right')
     let currentTotalBoxPosition = 'top-right';
+
+    // Função para iniciar o Sprint (inicia o relógio, oculta o popup de boas-vindas e exibe notificação)
+    function startSprint() {
+      document.getElementById('welcome-popup').style.display = 'none';
+      document.getElementById('global-clock').style.display = 'block';
+      globalTimerStart = Date.now();
+      globalTimerInterval = setInterval(function() {
+        let totalSeconds = Math.floor((Date.now() - globalTimerStart) / 1000);
+        document.getElementById('global-clock').textContent = formatTime(totalSeconds);
+      }, 1000);
+      // Exibe popup de notificação para "Sim"
+      document.getElementById('yes-notification-popup').style.display = 'block';
+      setTimeout(function() {
+        document.getElementById('yes-notification-popup').style.display = 'none';
+      }, 5000);
+    }
+
+    // Função para tratar o clique em "Não" no popup de boas-vindas
+    function handleNoSprint() {
+      document.getElementById('welcome-popup').style.display = 'none';
+      // Exibe popup de notificação para "Não"
+      document.getElementById('no-notification-popup').style.display = 'block';
+      setTimeout(function() {
+        document.getElementById('no-notification-popup').style.display = 'none';
+      }, 5000);
+    }
+
+    // Função para reiniciar o Sprint (resetar a página)
+    function resetSprint() {
+      window.location.reload();
+    }
 
     function setTurno(turno) {
       document.getElementById('turno').value = turno;
@@ -445,51 +660,50 @@
         <div class="equipe-header">
           <h3>🚗 LEAD:</h3>
           <select class="lead">
-            <!-- Turno B -->
-          <option value="DFJ-SG-01B">DFJ-SG-01B</option>
-          <option value="DFJ-SG-02B">DFJ-SG-02B</option>
-          <option value="DFJ-SG-03B">DFJ-SG-03B</option>
-          <option value="DFJ-SG-04B">DFJ-SG-04B</option>
-          <option value="DFJ-SG-05B">DFJ-SG-05B</option>
-          <option value="DFJ-SG-06B">DFJ-SG-06B</option>
-          <option value="DFJ-SG-07B">DFJ-SG-07B</option>
-          <option value="DFJ-SG-08B">DFJ-SG-08B</option>
-          <option value="DFJ-SG-09B">DFJ-SG-09B</option>
-          <option value="DFJ-SG-10B">DFJ-SG-10B</option>
-          <option value="DFJ-SG-11B">DFJ-SG-11B</option>
-          <option value="DFJ-SG-12B">DFJ-SG-12B</option>
-          <option value="DFJ-SG-13B">DFJ-SG-13B</option>
-          <option value="DFJ-SG-14B">DFJ-SG-14B</option>
-          <option value="DFJ-SG-15B">DFJ-SG-15B</option>
-          <option value="DFJ-SG-16B">DFJ-SG-16B</option>
-          <option value="DFJ-SG-17B">DFJ-SG-17B</option>
-          <option value="DFJ-SG-18B">DFJ-SG-18B</option>
-          <option value="DFJ-SG-19B">DFJ-SG-19B</option>
-          <option value="DFJ-SG-20B">DFJ-SG-20B</option>
-          <option value="DFJ-SG-21B">DFJ-SG-21B</option>
-          <option value="DFJ-SG-22B">DFJ-SG-22B</option>
-          <!-- Turno C -->
-          <option value="DFJ-SG-01C">DFJ-SG-01C</option>
-          <option value="DFJ-SG-02C">DFJ-SG-02C</option>
-          <option value="DFJ-SG-03C">DFJ-SG-03C</option>
-          <option value="DFJ-SG-04C">DFJ-SG-04C</option>
-          <option value="DFJ-SG-05C">DFJ-SG-05C</option>
-          <option value="DFJ-SG-06C">DFJ-SG-06C</option>
-          <option value="DFJ-SG-07C">DFJ-SG-07C</option>
-          <option value="DFJ-SG-08C">DFJ-SG-08C</option>
-          <option value="DFJ-SG-09C">DFJ-SG-09C</option>
-          <option value="DFJ-SG-10C">DFJ-SG-10C</option>
-          <option value="DFJ-SG-11C">DFJ-SG-11C</option>
-          <option value="DFJ-SG-12C">DFJ-SG-12C</option>
-          <option value="DFJ-SG-13C">DFJ-SG-13C</option>
-          <option value="DFJ-SG-14C">DFJ-SG-14C</option>
-          <option value="DFJ-SG-15C">DFJ-SG-15C</option>
-          <!-- Turno D -->
-          <option value="DFJ-SG-01D">DFJ-SG-01D</option>
-          <option value="DFJ-SG-02D">DFJ-SG-02D</option>
-          <option value="DFJ-SG-03D">DFJ-SG-03D</option>
-          <option value="DFJ-SG-04D">DFJ-SG-04D</option>
-          <option value="DFJ-SG-05D">DFJ-SG-05D</option>
+            <option value="DFJ-SG-01B">DFJ-SG-01B</option>
+            <option value="DFJ-SG-02B">DFJ-SG-02B</option>
+            <option value="DFJ-SG-03B">DFJ-SG-03B</option>
+            <option value="DFJ-SG-04B">DFJ-SG-04B</option>
+            <option value="DFJ-SG-05B">DFJ-SG-05B</option>
+            <option value="DFJ-SG-06B">DFJ-SG-06B</option>
+            <option value="DFJ-SG-07B">DFJ-SG-07B</option>
+            <option value="DFJ-SG-08B">DFJ-SG-08B</option>
+            <option value="DFJ-SG-09B">DFJ-SG-09B</option>
+            <option value="DFJ-SG-10B">DFJ-SG-10B</option>
+            <option value="DFJ-SG-11B">DFJ-SG-11B</option>
+            <option value="DFJ-SG-12B">DFJ-SG-12B</option>
+            <option value="DFJ-SG-13B">DFJ-SG-13B</option>
+            <option value="DFJ-SG-14B">DFJ-SG-14B</option>
+            <option value="DFJ-SG-15B">DFJ-SG-15B</option>
+            <option value="DFJ-SG-16B">DFJ-SG-16B</option>
+            <option value="DFJ-SG-17B">DFJ-SG-17B</option>
+            <option value="DFJ-SG-18B">DFJ-SG-18B</option>
+            <option value="DFJ-SG-19B">DFJ-SG-19B</option>
+            <option value="DFJ-SG-20B">DFJ-SG-20B</option>
+            <option value="DFJ-SG-21B">DFJ-SG-21B</option>
+            <option value="DFJ-SG-22B">DFJ-SG-22B</option>
+            <!-- Turno C -->
+            <option value="DFJ-SG-01C">DFJ-SG-01C</option>
+            <option value="DFJ-SG-02C">DFJ-SG-02C</option>
+            <option value="DFJ-SG-03C">DFJ-SG-03C</option>
+            <option value="DFJ-SG-04C">DFJ-SG-04C</option>
+            <option value="DFJ-SG-05C">DFJ-SG-05C</option>
+            <option value="DFJ-SG-06C">DFJ-SG-06C</option>
+            <option value="DFJ-SG-07C">DFJ-SG-07C</option>
+            <option value="DFJ-SG-08C">DFJ-SG-08C</option>
+            <option value="DFJ-SG-09C">DFJ-SG-09C</option>
+            <option value="DFJ-SG-10C">DFJ-SG-10C</option>
+            <option value="DFJ-SG-11C">DFJ-SG-11C</option>
+            <option value="DFJ-SG-12C">DFJ-SG-12C</option>
+            <option value="DFJ-SG-13C">DFJ-SG-13C</option>
+            <option value="DFJ-SG-14C">DFJ-SG-14C</option>
+            <option value="DFJ-SG-15C">DFJ-SG-15C</option>
+            <!-- Turno D -->
+            <option value="DFJ-SG-01D">DFJ-SG-01D</option>
+            <option value="DFJ-SG-02D">DFJ-SG-02D</option>
+            <option value="DFJ-SG-03D">DFJ-SG-03D</option>
+            <option value="DFJ-SG-04D">DFJ-SG-04D</option>
+            <option value="DFJ-SG-05D">DFJ-SG-05D</option>
           </select>
         </div>
         <div class="equipe-status">
@@ -568,6 +782,14 @@
                `*TIPO IMPRODUTIVA:* ${equipe.querySelector('.tipoImprodutiva').value}\n` +
                `*JUSTIFICATIVA:* ${equipe.querySelector('.justificativa').value}\n\n`;
       });
+      // Adiciona o tempo da sessão, se iniciado
+      if (globalTimerStart) {
+        let sessionSeconds = Math.floor((Date.now() - globalTimerStart) / 1000);
+        msg += `*TEMPO DA SESSÃO:* ${formatTime(sessionSeconds)}\n`;
+      }
+      // Adiciona a data completa por extenso
+      let now = new Date();
+      msg += formatFullDateTime(now) + "\n";
       msg = msg.toUpperCase();
       document.getElementById('mensagem').value = msg;
     }
@@ -576,7 +798,7 @@
       mensagem.select();
       document.execCommand('copy');
       document.getElementById('popup').style.display = 'block';
-      setTimeout(() => document.getElementById('popup').style.display = 'none', 2000);
+      setTimeout(() => document.getElementById('popup').style.display = 'none', 3000);
     }
     function enviarWhatsApp() {
       let mensagem = document.getElementById('mensagem').value;
@@ -585,6 +807,54 @@
     }
     function limparMensagem() {
       document.getElementById('mensagem').value = '';
+    }
+    
+    // Função para salvar a página como PDF (atualiza a mensagem antes de gerar o PDF)
+    function savePdf() {
+      gerarMensagem();
+      var container = document.querySelector('.container');
+      var width = container.offsetWidth;
+      var height = container.offsetHeight;
+      let now = new Date();
+      let data = document.getElementById('data').value;
+      let turno = document.getElementById('turno').value;
+      let base = document.getElementById('base').value;
+      let supervisor = document.getElementById('supervisor').value;
+      let fileName = "";
+      if(data && turno && base && supervisor) {
+          fileName = `${turno}_${base}_${supervisor}_${data}.pdf`;
+      } else {
+          fileName = `Produtividade_${now.toISOString()}.pdf`;
+      }
+      
+      html2pdf(container, {
+          margin: 0,
+          filename: fileName,
+          image: { type: 'jpeg', quality: 0.99 },
+          html2canvas: { scale: 2 },
+          jsPDF: {
+              unit: 'px',
+              format: [width, height],
+              orientation: 'portrait'
+          }
+      }).then(() => {
+          pdfSaved = true;
+          var pdfButton = document.getElementById('save-pdf-button');
+          pdfButton.textContent = "PDF já salvo";
+          pdfButton.style.backgroundColor = "#006400";
+          pdfButton.style.color = "#fff";
+          pdfButton.style.border = "2px solid #004d00";
+          pdfButton.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.3)";
+          document.getElementById('pdf-popup').style.display = 'block';
+          setTimeout(() => {
+              document.getElementById('pdf-popup').style.display = 'none';
+          }, 4000);
+      });
+    }
+
+    // Exibe o popup de boas-vindas ao carregar a página
+    window.onload = function() {
+      document.getElementById('welcome-popup').style.display = 'block';
     }
   </script>
 </body>
