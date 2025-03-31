@@ -9,9 +9,6 @@
   <!-- Importa a biblioteca html2pdf -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
 
-  <!-- ===============================
-       CSS - Estilos
-  ================================ -->
   <style>
     /* Bloqueia o pull-to-refresh */
     html, body {
@@ -29,9 +26,9 @@
       padding: 10px;
       border-radius: 8px;
       z-index: 1001;
-      display: none; /* exibido somente após iniciar o sprint */
+      display: none;
     }
-    /* Estilos para Popups (boas-vindas, notificações, cópia, PDF) */
+    /* Popup padrão (usado para boas-vindas, notificações, etc.) */
     .popup {
       display: none;
       position: fixed;
@@ -39,12 +36,12 @@
       left: 50%;
       transform: translate(-50%, -50%);
       padding: 20px;
-      background-color: rgba(0, 0, 0, 0.8);
-      color: white;
+      background-color: rgba(0,0,0,0.8);
+      color: #fff;
       font-size: 16px;
       border-radius: 5px;
       z-index: 1000;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
       text-align: center;
     }
     .popup-buttons {
@@ -61,11 +58,37 @@
     }
     .yes-button {
       background-color: #4CAF50;
-      color: white;
+      color: #fff;
     }
     .no-button {
       background-color: #f44336;
-      color: white;
+      color: #fff;
+    }
+    /* Popup que aparece ao clicar no overlay */
+    #body-popup {
+      display: none;
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: rgba(0,0,0,0.85);
+      color: #fff;
+      padding: 15px 20px;
+      border-radius: 8px;
+      z-index: 2500;
+      font-size: 18px;
+      cursor: pointer;
+    }
+    /* Overlay que intercepta cliques em toda a página quando o sprint não é iniciado */
+    #clickOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: transparent;
+      z-index: 2000;
+      display: none;
     }
     /* Caixa de Visualização */
     .preview-box {
@@ -89,9 +112,6 @@
       width: 100%; 
       height: 469px; 
     }
-    .hidden { 
-      display: none; 
-    }
     input[type="text"],
     input[type="date"],
     input[type="number"],
@@ -109,8 +129,8 @@
     .turno-option {
       padding: 3px 8px;
       margin: 3px;
-      background-color: rgba(255, 255, 255, 0.9);
-      border: 1px solid rgba(221, 221, 221, 0.89);
+      background-color: rgba(255,255,255,0.9);
+      border: 1px solid rgba(221,221,221,0.89);
       cursor: pointer;
       display: inline-block;
       font-size: 14px;
@@ -122,7 +142,7 @@
     .base-option.selected,
     .turno-option.selected {
       background-color: #000;
-      color: white;
+      color: #fff;
     }
     .supervisor-box {
       width: 100%;
@@ -134,7 +154,7 @@
     }
     /* Botões - Estilo Padrão */
     .button-default {
-      border: 1px solid black;
+      border: 1px solid #000;
       padding: 8px 16px;
       margin: 5px;
       background-color: #fff;
@@ -142,46 +162,57 @@
       font-size: 14px;
       border-radius: 4px;
       transition: all 0.3s ease;
-      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
     }
     .button-default:hover {
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
     }
     /* Botões Específicos */
     .button-gerarMensagem {
       background-color: #616964;
-      color: white;
+      color: #fff;
       padding: 8px 16px;
       margin: 5px;
       cursor: pointer;
       font-size: 14px;
       border-radius: 4px;
       transition: all 0.3s ease;
-      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
     }
     .button-enviarWhatsApp {
       background-color: #00b145;
-      color: white;
+      color: #fff;
       padding: 8px 16px;
       margin: 5px;
       cursor: pointer;
       font-size: 14px;
       border-radius: 4px;
       transition: all 0.3s ease;
-      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+    .button-save-pdf {
+      background-color: #2a834d;
+      color: #fff;
+      padding: 4px 16px;
+      margin: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      border-radius: 11px;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
     }
     .clear-button {
       background-color: #f44336;
-      color: white;
+      color: #fff;
       padding: 8px 16px;
       margin: 5px;
       cursor: pointer;
       font-size: 14px;
       border-radius: 4px;
       transition: all 0.3s ease;
-      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
     }
-    /* Popup para confirmação de cópia (id="popup") */
+    /* Popup para confirmação de cópia */
     #popup {
       display: none;
       position: fixed;
@@ -189,229 +220,18 @@
       left: 50%;
       transform: translate(-50%, -50%);
       padding: 20px;
-      background-color: rgba(0, 0, 0, 0.8);
-      color: white;
+      background-color: rgba(0,0,0,0.8);
+      color: #fff;
       font-size: 16px;
       border-radius: 5px;
       z-index: 1000;
     }
-    .input-container {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 11px;
-    }
-    .input-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      width: 40%;
-    }
-    .input-item label {
-      margin-bottom: 10px;
-    }
-    .input-item input {
-      width: 22%;
-      border-radius: 7px;
-    }
-    .produtivo-btn {
-      background-color: green;
-      color: white;
-    }
-    .improdutivo-btn {
-      background-color: red;
-      color: white;
-    }
-    .button-totalbtn {
-      background-color: #000;
-      color: white;
-      font-family: monospace;
-    }
-    /* ===============================
-         Estilos para Status Produtividade por Equipe
-    ================================ */
-    .equipe {
-      border: 2px solid #000;
-      border-radius: 10px;
-      margin-bottom: 37px;
-      background: #fff;
-      padding: 11px;
-      position: relative;
-    }
-    .chrome-tab {
-      position: absolute;
-      top: -31px;
-      left: 15px;
-      background-color: #000;
-      color: white;
-      padding: 5px 21px;
-      border-top-left-radius: 10px;
-      border-top-right-radius: 10px;
-      font-weight: bold;
-      font-size: 14px;
-    }
-    .equipe-header,
-    .equipe-status,
-    .equipe-details {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-    /* Cabeçalho: Lead */
-    .equipe-header h3 {
-      margin: 0;
-      background-color: #000;
-      margin-top: -74px;
-      margin-left: 1px;
-      border-top-left-radius: 10px;
-      border-top-right-radius: 10px;
-      color: white;
-      width: 32%;
-      font-size: 22px;
-      text-align: center;
-    }
-    .equipe-header select {
-      margin-left: -125px;
-      margin-top: -5px;
-      padding: 5px;
-    }
-    /* Status: Produtividade */
-    .equipe-status {
-      width: 121%;
-      margin-top: 4px;
-      padding: 0px;
-    }
-    /* Linha de status com os containers de PRODUTIVA e IMPRODUTIVA */
-    .status-row {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 15px;
-      width: 100%;
-      margin-bottom: 5px;
-    }
-    /* Containers de PRODUTIVA e IMPRODUTIVA */
-    .produtiva-container {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      padding: 5px;
-      margin-top: 10px;
-      margin-right: 10px;
-      margin-bottom: 10px;
-      margin-left: -77px;
-      box-sizing: border-box;
-    }
-    .improdutiva-container {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      padding: 5px;
-      margin-top: 10px;
-      margin-right: 10px;
-      margin-bottom: 10px;
-      margin-left: -9px;
-      box-sizing: border-box;
-    }
-    .produtiva-container label,
-    .improdutiva-container label {
-      margin: 0;
-      font-size: 14px;
-      white-space: nowrap;
-    }
-    .produtiva-container input,
-    .improdutiva-container input {
-      width: 50px;
-      padding: 2px;
-      text-align: right;
-      font-size: 14px;
-    }
-    /* Detalhes: Tipos e Justificativa */
-    .equipe-details {
-      width: 100%;
-      flex-direction: column;
-      margin-top: 10px;
-    }
-    .equipe-details label {
-      display: block;
-      margin-bottom: -22px;
-      font-size: 14px;
-    }
-    .equipe-details input {
-      width: 96%;
-      padding: 5px;
-      margin-bottom: 10px;
-      text-transform: uppercase;
-      font-size: 13px;
-    }
-    /* Caixa Total */
-    .total-box {
-      position: absolute;
-      background-color: #000;
-      color: #fff;
-      padding: 4px 8px;
-      border-radius: 10px;
-      font-size: 18px;
-    }
-    .total-top-right {
-      top: 5px;
-      right: 5px;
-    }
-    .total-top-left {
-      top: 5px;
-      left: 5px;
-    }
-    .total-bottom-right {
-      bottom: 5px;
-      right: 5px;
-    }
-    .total-bottom-left {
-      bottom: 5px;
-      left: 5px;
-    }
-    /* Responsividade */
-    @media(max-width: 480px) {
-      .status-row {
-        flex-direction: column;
-        gap: 10px;
-      }
-      .produtiva-container,
-      .improdutiva-container {
-        width: 100%;
-        justify-content: center;
-      }
-    }
-    @media (orientation: portrait) {
-      .container {
-        margin-top: 20px;
-        margin-bottom: 20px;
-      }
-    }
-    /* Botão Salvar PDF */
-    .button-save-pdf {
-      border: 1px solid black;
-      padding: 8px 16px;
-      margin: 30px 0;
-      background-color: #fff;
-      cursor: pointer;
-      font-size: 14px;
-      border-radius: 25px;
-      transition: all 0.3s ease;
-      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-      display: block;
-      width: fit-content;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    .button-save-pdf:hover {
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-    }
     /* Botão Reset (Reiniciar Sprint) */
     #reset-button {
-      border: 1px solid black;
+      border: 1px solid #000;
       padding: 8px 16px;
-      background-color: #000000;
-      color: white;
+      background-color: #000;
+      color: #fff;
       cursor: pointer;
       font-size: 14px;
       border-radius: 4px;
@@ -420,16 +240,21 @@
       width: fit-content;
       margin-left: auto;
       margin-right: auto;
+      z-index: 3000;
+      position: relative;
     }
   </style>
 </head>
 <body>
+  <!-- Overlay que intercepta todos os cliques (iniciará após a escolha "NÃO") -->
+  <div id="clickOverlay"></div>
+  
   <!-- Global Clock -->
   <div id="global-clock"></div>
   
   <!-- Popup de Boas-Vindas -->
   <div id="welcome-popup" class="popup">
-    <p>Bem-vindo!<br>Deseja iniciar o sprints?</p>
+    <p>Bem-vindo!<br>Deseja iniciar o sprint?</p>
     <div class="popup-buttons">
       <button class="yes-button" onclick="startSprint()">Sim</button>
       <button class="no-button" onclick="handleNoSprint()">Não</button>
@@ -443,9 +268,9 @@
   
   <!-- Popup de Notificação para Não -->
   <div id="no-notification-popup" class="popup">
-    <p>Todos campos foram bloqueados por favor, atualize a página usando o botão "Reiniciar Sprint".</p>
+    <p>Todos os campos foram bloqueados.<br>Atualize a página usando o botão "Reiniciar Sprint".</p>
   </div>
-
+  
   <!-- Popup para confirmação de cópia -->
   <div id="popup" class="popup">Mensagem Copiada!</div>
   
@@ -453,15 +278,38 @@
   <div id="pdf-popup" class="popup">
     PDF salvo com sucesso!
     <br>
-    <button id="pdf-popup-close" onclick="document.getElementById('pdf-popup').style.display='none'" style="margin-top: 10px; padding: 8px 16px; font-size: 14px; border: none; background-color: #4CAF50; color: white; border-radius: 4px; cursor: pointer;">Fechar</button>
+    <button id="pdf-popup-close" onclick="document.getElementById('pdf-popup').style.display='none'" style="margin-top: 10px; padding: 8px 16px; font-size: 14px; border: none; background-color: #4CAF50; color: #fff; border-radius: 4px; cursor: pointer;">Fechar</button>
+  </div>
+  
+  <!-- POPUPS ADICIONAIS -->
+  <!-- Popup para "Gerar Mensagem" -->
+  <div id="gerar-popup" class="popup">
+    <p>Mensagem Gerada!</p>
+    <button onclick="document.getElementById('gerar-popup').style.display='none'" style="margin-top: 10px; padding: 8px 16px; font-size: 14px; border: none; background-color: #4CAF50; color: #fff; border-radius: 4px; cursor: pointer;">Fechar</button>
+  </div>
+  
+  <!-- Popup para "Limpar Mensagem" -->
+  <div id="limpar-popup" class="popup">
+    <p>Mensagem limpa com sucesso!</p>
+    <button onclick="document.getElementById('limpar-popup').style.display='none'" style="margin-top: 10px; padding: 8px 16px; font-size: 14px; border: none; background-color: #4CAF50; color: #fff; border-radius: 4px; cursor: pointer;">Fechar</button>
+  </div>
+  
+  <!-- Popup para "Encaminhar via WhatsApp" -->
+  <div id="encaminhar-popup" class="popup">
+    <p>Mensagem encaminhada com sucesso!</p>
+    <button onclick="document.getElementById('encaminhar-popup').style.display='none'" style="margin-top: 10px; padding: 8px 16px; font-size: 14px; border: none; background-color: #4CAF50; color: #fff; border-radius: 4px; cursor: pointer;">Fechar</button>
+  </div>
+  
+  <!-- Popup que aparece ao clicar no overlay -->
+  <div id="body-popup" onclick="this.style.display='none'; event.stopPropagation();">
+    ⚠️ ATENÇÃO: Todos os campos estão bloqueados!<br>
+    Reinicie a página utilizando o botão "Reiniciar Sprint".
   </div>
 
-  <!-- ===============================
-       HTML - Estrutura do Corpo
-  ================================ -->
+  <!-- Conteúdo Principal -->
   <div class="container">
     <h2 style="text-align: center; font-size: 25px; font-weight: bold; color: #e63946;">
-      MODELO SPRINT/STATUS <br>PRODUTIVIDADE SUPERVISORES<br>
+      MODELO SPRINT/STATUS <br>PRODUTIVIDADE SUPERVISORES
     </h2>
     <h2 style="text-align: center; font-size: 21px; font-weight: bold; color: #000;">(Versão 2.0)</h2>
 
@@ -514,19 +362,19 @@
     <textarea id="mensagem" class="preview-box" readonly></textarea>
     <br>
     <!-- Botões para ações -->
-    <button class="button-gerarMensagem" onclick="gerarMensagem()">Gerar Mensagem</button>
-    <button class="button-enviarWhatsApp" onclick="enviarWhatsApp()">Encaminhar via WhatsApp</button><br>
-    <button class="clear-button" onclick="limparMensagem()">LIMPAR A MENSAGEM</button>
+    <button class="button-gerarMensagem" onclick="handleGerarMensagem()">Gerar Mensagem</button>
+    <button class="button-enviarWhatsApp" onclick="handleEnviarWhatsApp()">Encaminhar via WhatsApp</button><br>
+    <button class="clear-button" onclick="handleLimparMensagem()">Limpar Mensagem</button>
     <button class="button-default" onclick="copiarMensagem()">Copiar Mensagem</button>
     <br><br>
     <!-- Botão Salvar PDF -->
     <button class="button-save-pdf" id="save-pdf-button" onclick="savePdf()">Salvar PDF</button>
     <br><br>
-    <!-- Botão para Reiniciar Sprint -->
+    <!-- Botão para Reiniciar Sprint (sempre clicável) -->
     <button id="reset-button" onclick="resetSprint()">Reiniciar Sprint</button>
     <br><br>
     <!-- Logo da ENEL -->
-    <img src="https://upload.wikimedia.org/wikipedia/commons/2/22/Enel_Group_logo.svg" alt="Logo ENEL" class="enel-logo" style="width: 193px; height: auto; display: block; margin-left: auto; margin-right: auto;">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/2/22/Enel_Group_logo.svg" alt="Logo ENEL" style="width: 193px; height: auto; display: block; margin-left: auto; margin-right: auto;">
     <br>
   </div>
   <p style="text-align: center; font-style: italic; font-family: 'Courier New', Courier, monospace; margin-top: 40px;">
@@ -534,25 +382,26 @@
     Todos os direitos reservados.
   </p>
 
-  <!-- ===============================
-       JavaScript - Lógica e Funcionalidades
-  ================================ -->
   <script>
-    // Funções para desabilitar/habilitar os controles interativos (exceto os do popup e o reset)
+    // Exibe um popup padrão (exceto o do corpo) por um tempo determinado
+    function showPopup(popupId, duration) {
+      var popup = document.getElementById(popupId);
+      popup.style.display = 'block';
+      setTimeout(function() {
+        popup.style.display = 'none';
+      }, duration);
+    }
+
+    // Funções para desabilitar/habilitar os controles interativos (exceto o botão Reset e o popup de boas-vindas)
     function disableAllInteractive() {
       document.querySelectorAll('input, button, select, textarea').forEach(function(elem) {
-        if(elem.closest('#welcome-popup') || elem.id === 'reset-button'){
-          return;
-        }
+        if (elem.closest('#welcome-popup') || elem.id === 'reset-button') return;
         elem.disabled = true;
       });
     }
-
     function enableAllInteractive() {
       document.querySelectorAll('input, button, select, textarea').forEach(function(elem) {
-        if(elem.closest('#welcome-popup') || elem.id === 'reset-button'){
-          return;
-        }
+        if (elem.closest('#welcome-popup') || elem.id === 'reset-button') return;
         elem.disabled = false;
       });
     }
@@ -563,20 +412,17 @@
       let seconds = totalSeconds % 60;
       let result = "";
       if (minutes > 0) {
-          result += minutes + (minutes === 1 ? " minuto" : " minutos");
-          if (seconds > 0) result += " e " + seconds + (seconds === 1 ? " segundo" : " segundos");
+        result += minutes + (minutes === 1 ? " minuto" : " minutos");
+        if (seconds > 0) result += " e " + seconds + (seconds === 1 ? " segundo" : " segundos");
       } else {
-          result += seconds + (seconds === 1 ? " segundo" : " segundos");
+        result += seconds + (seconds === 1 ? " segundo" : " segundos");
       }
       return result;
     }
-
     // Função para formatar a data por extenso
     function formatFullDateTime(date) {
-      const meses = [
-          "janeiro", "fevereiro", "março", "abril", "maio", "junho",
-          "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"
-      ];
+      const meses = ["janeiro", "fevereiro", "março", "abril", "maio", "junho",
+                     "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
       let dia = date.getDate();
       let mes = meses[date.getMonth()];
       let ano = date.getFullYear();
@@ -594,10 +440,16 @@
     let globalTimerStart = null;
     let globalTimerInterval = null;
     let pdfSaved = false;
-    // Variável para a posição da caixa Total (padrão: 'top-right')
     let currentTotalBoxPosition = 'top-right';
 
-    // Função para iniciar o Sprint (ativa o relógio, habilita os controles, oculta o popup e exibe notificação)
+    // Ao carregar a página: desabilita os controles e exibe o popup de boas-vindas.
+    // O overlay (clickOverlay) NÃO é ativado neste momento.
+    window.onload = function() {
+      disableAllInteractive();
+      document.getElementById('welcome-popup').style.display = 'block';
+    }
+
+    // Função para iniciar o Sprint: habilita os controles, oculta o popup de boas-vindas e garante que o overlay fique oculto.
     function startSprint() {
       enableAllInteractive();
       document.getElementById('welcome-popup').style.display = 'none';
@@ -607,26 +459,22 @@
         let totalSeconds = Math.floor((Date.now() - globalTimerStart) / 1000);
         document.getElementById('global-clock').textContent = formatTime(totalSeconds);
       }, 1000);
-      // Exibe popup de notificação para "Sim"
-      document.getElementById('yes-notification-popup').style.display = 'block';
-      setTimeout(function() {
-        document.getElementById('yes-notification-popup').style.display = 'none';
-      }, 5000);
+      // Garante que o overlay seja ocultado
+      document.getElementById('clickOverlay').style.display = 'none';
+      document.getElementById('body-popup').style.display = 'none';
+      showPopup('yes-notification-popup', 5000);
     }
 
-    // Função para tratar o clique em "Não" no popup de boas-vindas (mantém os controles desabilitados e garante que o botão reset esteja ativo)
+    // Função para tratar o clique em "Não" no popup de boas-vindas.
+    // Fecha o popup de boas-vindas e ativa o overlay para interceptar cliques.
     function handleNoSprint() {
       document.getElementById('welcome-popup').style.display = 'none';
-      // Exibe popup de notificação para "Não"
-      document.getElementById('no-notification-popup').style.display = 'block';
-      setTimeout(function() {
-        document.getElementById('no-notification-popup').style.display = 'none';
-      }, 5000);
-      // Garante que o botão reset esteja habilitado
-      document.getElementById('reset-button').disabled = false;
+      showPopup('no-notification-popup', 5000);
+      // Ativa o overlay para interceptar todos os cliques
+      document.getElementById('clickOverlay').style.display = 'block';
     }
 
-    // Função para reiniciar o Sprint (resetar a página)
+    // Função para reiniciar o Sprint (recarrega a página)
     function resetSprint() {
       window.location.reload();
     }
@@ -643,9 +491,7 @@
         button.innerText.trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase() === 
         base.trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase()
       );
-      if (selectedButton) {
-        selectedButton.classList.add('selected');
-      }
+      if (selectedButton) selectedButton.classList.add('selected');
     }
     function selectSupervisor(nome) {
       let options = document.querySelectorAll('.supervisor-option');
@@ -663,11 +509,8 @@
         buttons = document.querySelectorAll('.base-option');
       }
       buttons.forEach(button => {
-        if (button.innerText === value) {
-          button.classList.add('selected');
-        } else {
-          button.classList.remove('selected');
-        }
+        if (button.innerText === value) button.classList.add('selected');
+        else button.classList.remove('selected');
       });
     }
     function adicionarEquipe() {
@@ -758,7 +601,6 @@
       let equipe = element.closest('.equipe');
       let produtivo = parseInt(equipe.querySelector('.produtivo').value) || 0;
       let improdutivo = parseInt(equipe.querySelector('.improdutivo').value) || 0;
-      // Atualiza o valor no span da caixa Total
       equipe.querySelector('.total-box .totalAtendimentos').innerText = produtivo + improdutivo;
       atualizarMediaProdutiva();
     }
@@ -779,6 +621,20 @@
         box.classList.remove('total-top-right', 'total-top-left', 'total-bottom-right', 'total-bottom-left');
         box.classList.add(`total-${position}`);
       });
+    }
+    
+    // Funções para os popups de ações (Gerar, Limpar, Encaminhar)
+    function handleGerarMensagem() {
+      gerarMensagem();
+      showPopup('gerar-popup', 5000);
+    }
+    function handleLimparMensagem() {
+      limparMensagem();
+      showPopup('limpar-popup', 5000);
+    }
+    function handleEnviarWhatsApp() {
+      enviarWhatsApp();
+      showPopup('encaminhar-popup', 10000);
     }
     function gerarMensagem() {
       let dataInput = document.getElementById('data').value;
@@ -837,7 +693,7 @@
       let base = document.getElementById('base').value;
       let supervisor = document.getElementById('supervisor').value;
       let fileName = "";
-      if(data && turno && base && supervisor) {
+      if (data && turno && base && supervisor) {
           fileName = `${turno}_${base}_${supervisor}_${data}.pdf`;
       } else {
           fileName = `Produtividade_${now.toISOString()}.pdf`;
@@ -860,7 +716,7 @@
           pdfButton.style.backgroundColor = "#006400";
           pdfButton.style.color = "#fff";
           pdfButton.style.border = "2px solid #004d00";
-          pdfButton.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.3)";
+          pdfButton.style.boxShadow = "0 0 10px rgba(0,0,0,0.3)";
           document.getElementById('pdf-popup').style.display = 'block';
           setTimeout(() => {
               document.getElementById('pdf-popup').style.display = 'none';
@@ -868,11 +724,13 @@
       });
     }
 
-    // Exibe o popup de boas-vindas e desabilita os controles ao carregar a página
-    window.onload = function() {
-      disableAllInteractive();
-      document.getElementById('welcome-popup').style.display = 'block';
-    }
+    // O overlay (clickOverlay) intercepta cliques em toda a página.
+    // Quando clicado, exibe o popup (body-popup) com a mensagem de aviso.
+    document.getElementById('clickOverlay').addEventListener('click', function(e) {
+      document.getElementById('body-popup').style.display = 'block';
+      // Impede que o clique propague para outras partes (se necessário)
+      e.stopPropagation();
+    });
   </script>
 </body>
 </html>
