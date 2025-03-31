@@ -26,9 +26,10 @@
       padding: 10px;
       border-radius: 8px;
       z-index: 1001;
-      display: none;
+      display: none; /* exibido somente após iniciar o sprint */
     }
     /* Popup padrão (usado para boas-vindas, notificações, etc.) */
+    /* Estilos para Popups (boas-vindas, notificações, cópia, PDF e novos pop-ups) */
     .popup {
       display: none;
       position: fixed;
@@ -36,12 +37,12 @@
       left: 50%;
       transform: translate(-50%, -50%);
       padding: 20px;
-      background-color: rgba(0,0,0,0.8);
-      color: #fff;
+      background-color: rgba(0, 0, 0, 0.8);
+      color: white;
       font-size: 16px;
       border-radius: 5px;
       z-index: 1000;
-      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
       text-align: center;
     }
     .popup-buttons {
@@ -138,6 +139,165 @@
       border-radius: 4px;
       transition: all 0.3s ease;
     }
+    /* ===============================
+         Estilos para Status Produtividade por Equipe
+    ================================ */
+    .equipe {
+      border: 2px solid #000;
+      border-radius: 10px;
+      margin-bottom: 37px;
+      background: #fff;
+      padding: 11px;
+      position: relative;
+    }
+    .chrome-tab {
+      position: absolute;
+      top: -31px;
+      left: 15px;
+      background-color: #000;
+      color: white;
+      padding: 5px 21px;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+    .equipe-header,
+    .equipe-status,
+    .equipe-details {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    /* Cabeçalho: Lead */
+    .equipe-header h3 {
+      margin: 0;
+      background-color: #000;
+      margin-top: -74px;
+      margin-left: 1px;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+      color: white;
+      width: 32%;
+      font-size: 22px;
+      text-align: center;
+    }
+    .equipe-header select {
+      margin-left: -125px;
+      margin-top: -5px;
+      padding: 5px;
+    }
+    /* Status: Produtividade */
+    .equipe-status {
+      width: 121%;
+      margin-top: 4px;
+      padding: 0px;
+    }
+    /* Linha de status com os containers de PRODUTIVA e IMPRODUTIVA */
+    .status-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 15px;
+      width: 100%;
+      margin-bottom: 5px;
+    }
+    /* Containers de PRODUTIVA e IMPRODUTIVA */
+    .produtiva-container {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px;
+      margin-top: 10px;
+      margin-right: 10px;
+      margin-bottom: 10px;
+      margin-left: -77px;
+      box-sizing: border-box;
+    }
+    .improdutiva-container {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px;
+      margin-top: 10px;
+      margin-right: 10px;
+      margin-bottom: 10px;
+      margin-left: -9px;
+      box-sizing: border-box;
+    }
+    .produtiva-container label,
+    .improdutiva-container label {
+      margin: 0;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+    .produtiva-container input,
+    .improdutiva-container input {
+      width: 50px;
+      padding: 2px;
+      text-align: right;
+      font-size: 14px;
+    }
+    /* Detalhes: Tipos e Justificativa */
+    .equipe-details {
+      width: 100%;
+      flex-direction: column;
+      margin-top: 10px;
+    }
+    .equipe-details label {
+      display: block;
+      margin-bottom: -22px;
+      font-size: 14px;
+    }
+    .equipe-details input {
+      width: 96%;
+      padding: 5px;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      font-size: 13px;
+    }
+    /* Caixa Total */
+    .total-box {
+      position: absolute;
+      background-color: #000;
+      color: #fff;
+      padding: 4px 8px;
+      border-radius: 10px;
+      font-size: 18px;
+    }
+    .total-top-right {
+      top: 5px;
+      right: 5px;
+    }
+    .total-top-left {
+      top: 5px;
+      left: 5px;
+    }
+    .total-bottom-right {
+      bottom: 5px;
+      right: 5px;
+    }
+    .total-bottom-left {
+      bottom: 5px;
+      left: 5px;
+    }
+     /* Responsividade */
+    @media(max-width: 200px) {
+      .status-row {
+        flex-direction: column;
+        gap: 10px;
+      }
+      .produtiva-container,
+      .improdutiva-container {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+    @media (orientation: portrait) {
+      .container {
+        margin-top: 20px;
+        margin-bottom: 20px;
+      }
     .supervisor-option.selected,
     .base-option.selected,
     .turno-option.selected {
@@ -187,17 +347,6 @@
       cursor: pointer;
       font-size: 14px;
       border-radius: 4px;
-      transition: all 0.3s ease;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
-    }
-    .button-save-pdf {
-      background-color: #2a834d;
-      color: #fff;
-      padding: 4px 16px;
-      margin: 5px;
-      cursor: pointer;
-      font-size: 14px;
-      border-radius: 11px;
       transition: all 0.3s ease;
       box-shadow: 0 0 5px rgba(0,0,0,0.1);
     }
