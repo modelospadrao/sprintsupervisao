@@ -365,8 +365,8 @@
       background-color: #000;
       color: #fff;
       cursor: pointer;
-      font-size: 14px;
-      border-radius: 4px;
+      font-size: 20px;
+      border-radius: 41px;
       margin: 10px;
       display: block;
       width: fit-content;
@@ -400,7 +400,7 @@
   
   <!-- Popup de Notificação para Não -->
   <div id="no-notification-popup" class="popup">
-    <p>Todos os campos foram bloqueados.<br>Atualize a página usando o botão "Reiniciar Sprint".</p>
+    <p>Preenchimento cancelado!</p>
   </div>
   
   <!-- Popup para confirmação de cópia -->
@@ -428,14 +428,14 @@
   
   <!-- Popup para "Encaminhar via WhatsApp" -->
   <div id="encaminhar-popup" class="popup">
-    <p>Mensagem encaminhada com sucesso!</p>
+    <p>Mensagem encaminhada com sucesso! Por favor reinicie o sprint!</p>
     <button onclick="document.getElementById('encaminhar-popup').style.display='none'" style="margin-top: 10px; padding: 8px 16px; font-size: 14px; border: none; background-color: #4CAF50; color: #fff; border-radius: 4px; cursor: pointer;">Fechar</button>
   </div>
   
   <!-- Popup que aparece ao clicar no overlay -->
   <div id="body-popup" onclick="this.style.display='none'; event.stopPropagation();">
     ⚠️ ATENÇÃO: Todos os campos estão bloqueados!<br>
-    Reinicie a página utilizando o botão "Reiniciar Sprint".
+    Reinicie a página utilizando o botão "REINICIAR SPRINT".
   </div>
 
   <!-- Conteúdo Principal -->
@@ -503,7 +503,7 @@
     <button class="button-save-pdf" id="save-pdf-button" onclick="savePdf()">Salvar PDF</button>
     <br><br>
     <!-- Botão para Reiniciar Sprint (sempre clicável) -->
-    <button id="reset-button" onclick="resetSprint()">Reiniciar Sprint</button>
+    <button style="text-align: center; font-style: italic; font-family: 'Courier New', Courier, monospace; margin-top: 10px;"  id="reset-button" onclick="resetSprint()">REINICIAR SPRINT!</button>
     <br><br>
     <!-- Logo da ENEL -->
     <img src="https://upload.wikimedia.org/wikipedia/commons/2/22/Enel_Group_logo.svg" alt="Logo ENEL" style="width: 193px; height: auto; display: block; margin-left: auto; margin-right: auto;">
