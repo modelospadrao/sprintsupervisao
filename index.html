@@ -791,7 +791,7 @@
       let data = new Date(dataInput);
       data.setHours(data.getHours() + data.getTimezoneOffset() / 60);
       let dataFormatada = `${String(data.getDate()).padStart(2, '0')}/${String(data.getMonth() + 1).padStart(2, '0')}/${data.getFullYear()}`;
-      let msg = `----------------- *PRODUTIVIDADE* -------------------\n` +
+      let msg = `----- *PRODUTIVIDADE* -----\n` +
                 `*TURNO:* ${document.getElementById('turno').value}\n` +
                 `*DATA:* ${dataFormatada}\n` +
                 `*BASE:* ${document.getElementById('base').value}\n` +
@@ -800,7 +800,7 @@
                 `*QTD EQUIPE PODAS:* ${document.getElementById('qtdEquipepd').value}\n` +
                 `*MÉDIA GERAL:* ${document.getElementById('mediaProdutiva').innerText}\n\n`;
       document.querySelectorAll('.equipe').forEach(equipe => {
-        msg += `----------------------------------------------------\n` +
+        msg += `------------------------------\n` +
                `*LEAD:* ${equipe.querySelector('.lead').value}\n` +
                `*PRODUTIVO:* ${equipe.querySelector('.produtivo').value}\n` +
                `*IMPRODUTIVO:* ${equipe.querySelector('.improdutivo').value}\n` +
