@@ -455,25 +455,27 @@
     <h2 style="text-align: center; font-size: 25px; font-weight: bold; color: #e63946;">
       MODELO SPRINT/STATUS <br>PRODUTIVIDADE SUPERVISORES
     </h2>
-    <h2 style="text-align: center; font-size: 21px; font-weight: bold; color: #000;">(Versão 2.0)</h2>
+    <h2 style="text-align: center; font-size: 21px; font-weight: bold; color: #000;">(Versão 3.0)</h2>
 
-    <h2>🗒️ Preencha os dados</h2>
+    <h2 style="color: #e63946; font-size: 22px; text-align: center; margin: 20px 0; border-bottom: 5px solid #e63946;">
+        Preencha Informação do turno
+      </h2>
     <br>
     <label>📅 Data:</label>
     <input type="date" id="data">
-    <br><br>
+    <br>
     <label>🕒 Turno:</label>
     <input type="text" id="turno" maxlength="1">
     <button class="button-default turno-option" onclick="setTurno('B')">B</button>
     <button class="button-default turno-option" onclick="setTurno('C')">C</button>
     <button class="button-default turno-option" onclick="setTurno('D')">D</button>
-    <br><br>
+    <br>
     <label>🏬Base:</label>
     <input type="text" id="base" readonly>
     <button class="button-default base-option" onclick="setBase('JACARECANGA')">Jacarecanga</button>
     <button class="button-default base-option" onclick="setBase('MARACANAU')">Maracanaú</button>
     <button class="button-default base-option" onclick="setBase('MESSEJANA')">Messejana</button>
-    <br><br>
+    <br>
     <label>👤 Supervisor:</label>
     <input type="text" id="supervisor" class="supervisor-box" readonly>
     <div id="supervisores">
@@ -492,17 +494,20 @@
     <label>🚗 Quantidade de Equipes atuando em Podas:</label>
     <input type="number" id="qtdEquipepd" maxlength="2">
     
-    <h2>📌 Status Produtividade por Equipes</h2>
+    <h2 style="color: #e63946; font-size: 22px; text-align: center; margin: 20px 0; border-bottom: 5px solid #e63946;">
+        Status Produtividade por Equipes
+      </h2>
+    <h1 style="text-align: right; font-size: 24px; font-weight: bold; color: #000000;">
+      Média Geral: <span id="mediaProdutiva">0</span>
+    </h1>
     <br>
     <div id="equipes"></div>
     <br>
-    <h2 style="text-align: left; font-size: 24px; font-weight: bold; color: #e63946;">
-      Média Geral: <span id="mediaProdutiva">0</span>
-    </h2>
-    <button onclick="adicionarEquipe()">Adicionar Equipe</button>
-    <button onclick="removerEquipe()">Remover Equipe</button>
-    <br>
-    <h2>Mensagem de Previsualização</h2>
+    <button class=button-default onclick="adicionarEquipe()">Adicionar Equipe</button>
+    <button class=clear-button onclick="removerEquipe()">Remover Equipe</button>
+    <h2 style="color: #000000; font-size: 22px; text-align: center; margin: 20px 0; border-bottom: 5px solid #000000;">
+        Mensagem de Previsualização
+      </h2>
     <textarea id="mensagem" class="preview-box" readonly></textarea>
     <br>
     <!-- Botões para ações -->
